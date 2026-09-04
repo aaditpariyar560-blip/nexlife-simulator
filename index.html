@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>NEXLIFE AI — Future Simulator</title>
+
+<style>
+:root{
+  --bg:#050812;
+  --card:rgba(12,18,32,.78);
+  --line:#1d2b45;
+  --text:#f5f8ff;
+  --muted:#8e9bb2;
+  --cyan:#18d7ff;
+  --purple:#7865ff;
+}
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  font-family:Arial,Helvetica,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+}
+
+body:before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-2;
+  background:
+  radial-gradient(circle at 15% 10%,#103c58 0,transparent 25%),
+  radial-gradient(circle at 85% 70%,#25184d 0,transparent 28%),
+  linear-gradient(135deg,#050812,#080c18);
+}
+
+body:after{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  opacity:.15;
+  background-image:
+  linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);
+  background-size:45px 45px;
+  pointer-events:none;
+}
+
+.wrap{
+  width:min(1120px,92%);
+  margin:auto;
+}
+
+nav{
+  height:78px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:11px;
+  font-weight:900;
+  letter-spacing:3px;
+}
+
+.mark{
+  width:40px;
+  height:40px;
+  border:2px solid var(--cyan);
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  box-shadow:0 0 28px #18d7ff55;
+}
+
+.mark:after{
+  content:"N";
+  font-style:italic;
+  font-size:23px;
+}
+
+.navtag{
+  font-size:12px;
+  color:var(--muted);
+  letter-spacing:1.5px;
+}
+
+.hero{
+  text-align:center;
+  padding:70px 0 52px;
+}
+
+.pill{
+  display:inline-block;
+  border:1px solid #18d7ff55;
+  background:#18d7ff0d;
+  color:#79eaff;
+  padding:8px 14px;
+  border-radius:999px;
+  font-size:12px;
+}
+
+h1{
+  font-size:clamp(45px,8vw,82px);
+  line-height:.98;
+  margin:20px 0;
+}
+
+.grad{
+  background:linear-gradient(90deg,#fff,#63e8ff,#9d91ff);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+
+.hero p{
+  max-width:700px;
+  margin:auto;
+  color:var(--muted);
+  font-size:17px;
+  line-height:1.65;
+}
+
+.btn{
+  border:0;
+  border-radius:13px;
+  padding:14px 21px;
+  font-weight:800;
+  color:#fff;
+  background:linear-gradient(100deg,var(--cyan),var(--purple));
+  cursor:pointer;
+  box-shadow:0 12px 35px #18d7ff1f;
+  transition:.2s;
+}
+
+.btn:hover{
+  transform:translateY(-2px);
+  filter:brightness(1.08);
+}
+
+.hero .btn{
+  margin-top:25px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+  padding-bottom:55px;
+}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:25px;
+  backdrop-filter:blur(12px);
+  box-shadow:0 20px 70px #0004;
+}
+
+.card h2{
+  font-size:22px;
+  margin-bottom:7px;
+}
+
+.sub{
+  font-size:13px;
+  color:var(--muted);
+  margin-bottom:19px;
+}
+
+label{
+  display:block;
+  color:#cbd4e4;
+  font-size:13px;
+  margin:14px 0 7px;
+}
+
+input,
+select,
+textarea{
+  width:100%;
+  padding:13px 14px;
+  background:#070c16;
+  color:#fff;
+  border:1px solid #263651;
+  border-radius:11px;
+  outline:0;
+  font:inherit;
+}
+
+textarea{
+  min-height:90px;
+  resize:vertical;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+  border-color:var(--cyan);
+  box-shadow:0 0 0 3px #18d7ff0d;
+}
+
+.full{
+  width:100%;
+  margin-top:19px;
+}
+
+.result{
+  display:none;
+}
+
+.profile{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:17px;
+}
+
+.chip{
+  padding:7px 10px;
+  border-radius:999px;
+  background:#0a1424;
+  border:1px solid #223452;
+  color:#b8c6db;
+  font-size:12px;
+}
+
+.meter{
+  height:8px;
+  background:#101a2a;
+  border-radius:99px;
+  overflow:hidden;
+  margin:10px 0 18px;
+}
+
+.meter i{
+  display:block;
+  height:100%;
+  width:0;
+  background:linear-gradient(90deg,var(--cyan),var(--purple));
+  transition:1s;
+}
+
+.insight{
+  padding:15px;
+  border-radius:14px;
+  background:linear-gradient(135deg,#0d1d2d,#11142b);
+  border:1px solid #263650;
+  color:#bdc8da;
+  font-size:14px;
+  line-height:1.55;
+}
+
+.timeline{
+  display:grid;
+  gap:11px;
+}
+
+.step{
+  display:flex;
+  gap:13px;
+  padding:15px;
+  border:1px solid #1c2b44;
+  background:#08101d;
+  border-radius:14px;
+}
+
+.num{
+  min-width:34px;
+  height:34px;
+  border-radius:10px;
+  display:grid;
+  place-items:center;
+  background:#12cfff1a;
+  color:#62e8ff;
+  font-weight:900;
+}
+
+.step b{
+  display:block;
+  margin-bottom:4px;
+}
+
+.step span{
+  color:#9eabc0;
+  font-size:13px;
+  line-height:1.5;
+}
+
+.note{
+  font-size:11px;
+  color:#68768d;
+  line-height:1.5;
+  margin-top:13px;
+}
+
+footer{
+  text-align:center;
+  border-top:1px solid #111d31;
+  padding:25px;
+  color:#647188;
+  font-size:12px;
+}
+
+@media(max-width:760px){
+
+  .grid{
+    grid-template-columns:1fr;
+  }
+
+  .hero{
+    padding-top:45px;
+  }
+
+  .navtag{
+    display:none;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+<nav>
+
+<div class="brand">
+<div class="mark"></div>
+NEXLIFE
+</div>
+
+<div class="navtag">
+AI FUTURE SIMULATOR
+</div>
+
+</nav>
+
+
+<section class="hero">
+
+<span class="pill">
+✦ YOUR NEXT CHAPTER STARTS HERE
+</span>
+
+<h1>
+Simulate your
+<span class="grad">
+possible future.
+</span>
+</h1>
+
+<p>
+NEXLIFE turns your goals, habits and choices into an interactive future scenario — designed for motivation, planning and experimentation.
+</p>
+
+<button
+class="btn"
+onclick="document.getElementById('sim').scrollIntoView()">
+
+Start Simulation →
+
+</button>
+
+</section>
+
+
+<section class="grid" id="sim">
+
+
+<div class="card">
+
+<h2>
+Create your scenario
+</h2>
+
+<div class="sub">
+The more context you give, the more personal the simulation feels.
+</div>
+
+
+<label>Name</label>
+
+<input
+id="name"
+placeholder="Your name"
+>
+
+
+<label>Age</label>
+
+<input
+id="age"
+type="number"
+min="1"
+max="100"
+placeholder="e.g. 18"
+>
+
+
+<label>Primary goal</label>
+
+<select id="goal">
+
+<option value="singer">
+🎤 Become a singer
+</option>
+
+<option value="business">
+💰 Build a business
+</option>
+
+<option value="tech">
+💻 Build a tech career
+</option>
+
+<option value="study">
+📚 Improve studies
+</option>
+
+<option value="creator">
+🎬 Become a content creator
+</option>
+
+</select>
+
+
+<label>Daily effort</label>
+
+<select id="effort">
+
+<option value="low">
+30 minutes
+</option>
+
+<option value="medium">
+1–2 hours
+</option>
+
+<option value="high">
+3+ hours
+</option>
+
+</select>
+
+
+<label>
+What are you working with right now?
+</label>
+
+<textarea
+id="context"
+placeholder="Example: I have a guitar, a phone and a small budget..."
+></textarea>
+
+
+<button
+class="btn full"
+onclick="runSim()">
+
+🔮 Generate Future Simulation
+
+</button>
+
+
+<div class="note">
+This is a planning/creative simulation, not a prediction or guarantee of what will happen.
+</div>
+
+</div>
+
+
+<div class="card result" id="result">
+
+<h2 id="title">
+Your NEXLIFE
+</h2>
+
+<div
+class="profile"
+id="chips">
+</div>
+
+
+<div class="sub">
+Momentum score
+</div>
+
+<div class="meter">
+<i id="bar"></i>
+</div>
+
+
+<div
+class="insight"
+id="insight">
+</div>
+
+
+<div
+class="timeline"
+id="timeline"
+style="margin-top:15px">
+</div>
+
+</div>
+
+
+<div class="card" id="how">
+
+<h2>
+How NEXLIFE works
+</h2>
+
+<div class="sub">
+Think of it as a future-planning game.
+</div>
+
+
+<div class="step">
+
+<div class="num">1</div>
+
+<div>
+<b>Choose a direction</b>
+
+<span>
+Pick the future you want to explore.
+</span>
+
+</div>
+
+</div>
+
+
+<div class="step" style="margin-top:12px">
+
+<div class="num">2</div>
+
+<div>
+<b>Set your effort</b>
+
+<span>
+Tell NEXLIFE how much time you can realistically invest.
+</span>
+
+</div>
+
+</div>
+
+
+<div class="step" style="margin-top:12px">
+
+<div class="num">3</div>
+
+<div>
+<b>Explore scenarios</b>
+
+<span>
+See milestones that could happen if you stay consistent.
+</span>
+
+</div>
+
+</div>
+
+
+<div class="step" style="margin-top:12px">
+
+<div class="num">4</div>
+
+<div>
+<b>Take action</b>
+
+<span>
+Use the simulation as a roadmap, then adjust it as your real life changes.
+</span>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+</div>
+
+
+<footer>
+
+© 2026 NEXLIFE — Explore. Choose. Grow.
+
+</footer>
+
+
+<script>
+
+const data={
+
+singer:[
+"Build vocal and guitar practice habits.",
+"Record your first clean demo and get useful feedback.",
+"Release original/cover projects consistently and grow a small audience.",
+"Develop a portfolio, stage confidence and opportunities to perform."
+],
+
+business:[
+"Test one simple product or service with a small budget.",
+"Track customers, costs and feedback; improve what sells.",
+"Create repeatable operations and stronger branding.",
+"Build toward a more stable small business with measurable revenue."
+],
+
+tech:[
+"Choose one practical skill and start a focused learning routine.",
+"Complete small projects and publish a beginner portfolio.",
+"Take on harder projects and seek real-world experience.",
+"Aim for a stronger portfolio and entry-level opportunities."
+],
+
+study:[
+"Identify weak topics and create a realistic weekly routine.",
+"Use active recall and practice tests to measure improvement.",
+"Strengthen difficult chapters and improve exam technique.",
+"Build consistency, confidence and stronger academic performance."
+],
+
+creator:[
+"Choose a clear content theme and posting routine.",
+"Study analytics and improve hooks, editing and storytelling.",
+"Develop a recognizable style and experiment with collaborations.",
+"Build a stronger portfolio and a growing audience over time."
+]
+
+};
+
+
+const labels={
+singer:"Singer",
+business:"Business",
+tech:"Tech",
+study:"Studies",
+creator:"Creator"
+};
+
+
+function runSim(){
+
+const name=
+document.getElementById("name")
+.value.trim() || "You";
+
+const age=
+document.getElementById("age")
+.value || "—";
+
+const goal=
+document.getElementById("goal")
+.value;
+
+const effort=
+document.getElementById("effort")
+.value;
+
+const ctx=
+document.getElementById("context")
+.value.trim();
+
+
+const score=
+effort==="high"
+?88
+:effort==="medium"
+?72
+:55;
+
+
+document.getElementById("title")
+.textContent=
+name+"'s Future Simulation";
+
+
+document.getElementById("chips")
+.innerHTML=`
+
+<span class="chip">
+Age ${age}
+</span>
+
+<span class="chip">
+${labels[goal]}
+</span>
+
+<span class="chip">
+${
+effort==="high"
+?"3+ hours"
+:effort==="medium"
+?"1–2 hours"
+:"30 minutes"
+}
+daily
+</span>
+
+`;
+
+
+document.getElementById("bar")
+.style.width=
+score+"%";
+
+
+document.getElementById("insight")
+.textContent=
+
+ctx
+
+?
+
+`Starting point noted: "${ctx.slice(0,140)}${ctx.length>140?"…":""}" Your strongest advantage is consistency. Treat each milestone as a checkpoint, not a promise.`
+
+:
+
+"Your biggest advantage is consistency. Start small, measure progress and increase the challenge when the routine becomes easy.";
+
+
+document.getElementById("timeline")
+.innerHTML=
+
+data[goal]
+.map((x,i)=>`
+
+<div class="step">
+
+<div class="num">
+${i+1}
+</div>
+
+<div>
+
+<b>
+${[
+"Next 30 days",
+"3 months",
+"6 months",
+"12 months"
+][i]}
+</b>
+
+<span>
+${x}
+</span>
+
+</div>
+
+</div>
+
+`)
+.join("");
+
+
+document.getElementById("result")
+.style.display="block";
+
+
+document.getElementById("how")
+.style.display="none";
+
+
+document.getElementById("result")
+.scrollIntoView({
+behavior:"smooth",
+block:"start"
+});
+
+}
+
+</script>
+
+</body>
+</html>
